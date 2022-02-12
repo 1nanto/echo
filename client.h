@@ -5,11 +5,15 @@ using namespace boost::asio;
 
 class Client {
 public:
-    Client() { }
+    Client() = default;
 
-    void connect(ip::address_v4 ipv4, int port);
+    void connect(std::string ip_str, int port);
+    std::string readMessage();
+    void sendMessage(std::string message);
+    void closeConnection();
 
 private:
     io_service service;
+    ip::tcp::socket socket{ service };
     streambuf buf;
 };

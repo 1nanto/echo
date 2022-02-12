@@ -5,31 +5,27 @@
 
 using namespace boost::asio;
 
-void Server::listen() 
-{
-    ip::tcp::acceptor acceptor(service, endpoint);
+void Server::listen() {
+    acceptor.accept(socket);
+}
+
+std::string Server::readMessage() {
     std::ostringstream oss;
-    std::string message;
-    std::cout << "Listening..." << std::endl;
-    while (true)
-    {
-        ip::tcp::socket socket(service);
-        acceptor.accept(socket);
-        do 
-        {
-            size_t bytes = read_until(socket, buf, '\n');
+    size_t bytes = read_until(socket, buf, '\n');
 
-            oss.str("");
-            oss << &buf;
-            message = oss.str();
-            buf.consume(bytes);
+    oss.str("");
+    oss << &buf;
+    buf.consume(bytes);
+    std::string message = oss.str();
+    message.pop_back();
+    return message;
+}
 
-            if (!message.compare("quit\n")) break;
+void Server::sendMessage(std::string message) {
+    message += '\n';
+    socket.write_some(buffer(message));
+}
 
-            std::cout << "New message: " << message;
-            socket.write_some(buffer(message));
-        } 
-        while (true);
-        socket.close();
-    }
+void Server::closeConnection() {
+    socket.close();
 }

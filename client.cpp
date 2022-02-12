@@ -5,35 +5,28 @@
 
 using namespace boost::asio;
 
-void Client::connect(ip::address_v4 ipv4, int port)
-{
-    ip::tcp::socket socket(service);
-    ip::tcp::endpoint ep(ipv4, port);
+void Client::connect(std::string ip_str, int port) {
+    ip::tcp::endpoint ep(ip::address_v4::from_string(ip_str), port);
     socket.connect(ep);
+}
 
-    std::cout << "Enter messages: " << std::endl;
-    std::string message;
-    do 
-    {
-        std::cin >> message;
-        message += '\n';
-        socket.write_some(buffer(message));
+std::string Client::readMessage() {
+    std::ostringstream oss;
+    size_t bytes = read_until(socket, buf, '\n');
 
-        if (!message.compare("quit\n")) break;
+    oss.str("");
+    oss << &buf;
+    buf.consume(bytes);
+    std::string message = oss.str();
+    message.pop_back();
+    return message;
+}
 
-        streambuf buf;
-        int bytes = read_until(socket, buf, "\n");
-        if (bytes == 0) {
-            std::cout << "no message" << std::endl;
-            continue;
-        }
-        std::ostringstream oss;
-        oss << &buf;
-        std::cout << (oss.str() == message ? "Right. " : "Wrong. ");
-        message.pop_back();
-        std::cout << "Server answered: " << message << std::endl;
-    } 
-    while (true);
+void Client::sendMessage(std::string message) {
+    message += '\n';
+    socket.write_some(buffer(message));
+}
 
+void Client::closeConnection() {
     socket.close();
 }
