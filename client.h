@@ -1,19 +1,18 @@
 #pragma once
 #include <boost/asio.hpp>
 
-using namespace boost::asio;
-
-class Client {
+class Client 
+{
 public:
-    Client() = default;
-
-    void connect(std::string ip_str, int port);
+    void connect(const std::string& ip_str, int port);
     std::string readMessage();
-    void sendMessage(std::string message);
+    void sendMessage(const std::string& message);
     void closeConnection();
 
+    ~Client();
+
 private:
-    io_service service;
-    ip::tcp::socket socket{ service };
-    streambuf buf;
+    boost::asio::io_service mService;
+    boost::asio::ip::tcp::socket mSocket{ mService };
+    boost::asio::streambuf mBuf;
 };

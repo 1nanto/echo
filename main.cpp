@@ -29,7 +29,10 @@ int main()
             try 
             {
                 message = server.readMessage();
-                if (!message.compare("quit")) break;
+
+                if (!message.compare("quit")) 
+                    break;
+
                 std::cout << "New message: " << message << std::endl;
                 server.sendMessage(message);
             }
@@ -64,7 +67,10 @@ int main()
             {
                 std::getline(std::cin, message);
                 client.sendMessage(message);
-                if (!message.compare("quit")) break;
+
+                if (!message.compare("quit")) 
+                    break;
+
                 answer = client.readMessage();
                 std::cout << "Server answered: " << answer << (message.compare(answer) ? ". Wrong." : ". Right.") << std::endl;
             }

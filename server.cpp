@@ -5,27 +5,39 @@
 
 using namespace boost::asio;
 
-void Server::listen() {
-    acceptor.accept(socket);
+Server::Server(unsigned short port) : 
+    mAcceptor(mService, ip::tcp::endpoint(ip::tcp::v4(), port)), mSocket(mService)
+{ }
+
+void Server::listen() 
+{
+    mAcceptor.accept(mSocket);
 }
 
-std::string Server::readMessage() {
+std::string Server::readMessage() 
+{
     std::ostringstream oss;
-    size_t bytes = read_until(socket, buf, '\n');
+    size_t bytes = read_until(mSocket, mBuf, '\n');
 
     oss.str("");
-    oss << &buf;
-    buf.consume(bytes);
+    oss << &mBuf;
+    mBuf.consume(bytes);
     std::string message = oss.str();
     message.pop_back();
     return message;
 }
 
-void Server::sendMessage(std::string message) {
-    message += '\n';
-    socket.write_some(buffer(message));
+void Server::sendMessage(const std::string& message)
+{
+    mSocket.write_some(buffer(message + '\n'));
 }
 
-void Server::closeConnection() {
-    socket.close();
+void Server::closeConnection() 
+{
+    mSocket.close();
+}
+
+Server::~Server() 
+{
+   if (mSocket.is_open()) mSocket.close();
 }

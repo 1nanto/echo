@@ -1,22 +1,21 @@
 #pragma once
 #include <boost/asio.hpp>
 
-using namespace boost::asio;
-
-class Server {
+class Server 
+{
 public:
-    Server(unsigned short port) :
-        acceptor(service, ip::tcp::endpoint(ip::tcp::v4(), port)), socket(service)
-    { }
+    Server(unsigned short port);
 
     void listen();
     std::string readMessage();
-    void sendMessage(std::string message);
+    void sendMessage(const std::string& message);
     void closeConnection();
 
+    ~Server();
+
 private:
-    io_service service;
-    ip::tcp::acceptor acceptor;
-    ip::tcp::socket socket;
-    streambuf buf;
+    boost::asio::io_service mService;
+    boost::asio::ip::tcp::acceptor mAcceptor;
+    boost::asio::ip::tcp::socket mSocket;
+    boost::asio::streambuf mBuf;
 };
